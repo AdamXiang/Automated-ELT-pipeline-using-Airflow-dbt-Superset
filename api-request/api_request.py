@@ -1,10 +1,14 @@
+import os
+
 import requests
 from dotenv import load_dotenv
-
+import os
 
 load_dotenv('./.env')
 
-api_url = ''
+api_key = os.getenv('API_KEY')
+
+api_url = f'http://api.weatherstack.com/current?access_key={api_key}&query=New York'
 
 def fetch_data():
   print("Fetching weather data from Weatherstack API...")
