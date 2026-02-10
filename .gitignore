@@ -10,6 +10,8 @@ wheels/
 .venv
 .env
 .idea
+.idea/
+.idea/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -227,4 +229,56 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+
+
+# --- Python 通用 ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+.python-version
+
+# --- 環境變數與密碼 (絕對不可上傳) ---
+.env
+.env.*
+!.env.example
+standalone_admin_password.txt
+
+# --- Airflow 專屬 ---
+# 忽略 Airflow 運作時產生的大量日誌
+logs/
+*.log
+
+# 忽略本地開發時產生的 SQLite DB (正式環境用 Postgres)
+airflow.db
+airflow.db-journal
+
+# 忽略 Airflow 本地設定檔 (通常 Docker 環境是用 env vars 控制)
+airflow.cfg
+webserver_config.py
+
+# 忽略 Airflow 執行時產生的暫存檔
+airflow-worker.pid
+airflow-webserver.pid
+
+# --- Docker & Postgres 資料掛載 ---
+# 這是最重要的一點：忽略本地掛載的資料庫檔案
+postgres-data/
+pgdata/
+db_data/
+airflow_data/
+
+# Docker Compose 本地覆寫設定 (如果有)
+docker-compose.override.yml
+
+# --- IDE 設定 ---
+.idea/
+.vscode/
+*.swp
+.DS_Store
 
