@@ -25,6 +25,9 @@ services:
     volumes:
       - ./dags:/opt/airflow/dags
       - ./api-request:/opt/airflow/api-request
+      - /var/run/docker.sock:/var/run/docker.sock
+    group_add:
+      - '1001'
     depends_on:
       - postgres
     networks:

@@ -1,8 +1,8 @@
 import sys
 from airflow.decorators import dag, task
+from airflow.providers.docker.operators.docker import DockerOperator
 from datetime import datetime, timedelta
 from docker.types import Mount
-from airflow.providers.docker.operators.docker import DockerOperator
 
 # 注意：sys.path.append 必須在 import insert_records 之前執行
 sys.path.append('/opt/airflow/api-request')
@@ -25,12 +25,6 @@ default_args = {
 )
 def weather_api_pipeline():
 
-    # 將原本的 PythonOperator 改寫為 @task 裝飾的函數
-    @task(task_id='task1')
-    def run_insert_records():
-        # 直接呼叫引入的 main 函數
-        main()
-
     run_dbt = DockerOperator(
         task_id='transform_data_task',
         image='ghcr.io/dbt-labs/dbt-postgres:1.9.latest',
@@ -48,15 +42,10 @@ def weather_api_pipeline():
                 type='bind'
             )
         ],
-        network_mode='projectwithsuperset_my-network',  # need to add your project name as prefix,
+        network_mode='projectwithsuperset_my-network', # need to add your project name as prefix,
         docker_url='unix:///var/run/docker.sock',
         auto_remove='success',
     )
-
-    # 執行 Task
-    ingest_task = run_insert_records()
-
-    ingest_task >> run_dbt
 
 # 實例化 DAG
 weather_api_pipeline()
