@@ -3,11 +3,11 @@ from api_request import mock_fetch_data, fetch_data
 import psycopg2
 from dotenv import load_dotenv
 
-load_dotenv('./.env')
+load_dotenv('../.env')
 
 DB_PASSWORD = os.getenv('DB_PASSWORD')
 
-
+print(DB_PASSWORD)
 
 def connect_to_postgres():
     print("Connecting to the PostgreSQL database...")
@@ -41,7 +41,7 @@ def create_tables(conn):
                 weather_description TEXT,
                 wind_speed FLOAT,
                 time TIMESTAMP,
-                inserted_at TIMESTAMP DEFAULT NOT(),
+                inserted_at TIMESTAMP DEFAULT NOW(),
                 utc_offset TEXT
             );
         ''')
