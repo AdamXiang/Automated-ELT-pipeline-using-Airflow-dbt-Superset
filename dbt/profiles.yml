@@ -1,0 +1,12 @@
+weather_project:
+  outputs:
+    dev:
+      dbname: weather_db
+      host: postgres
+      pass: postgres
+      port: 5432
+      schema: dev
+      threads: 4
+      type: postgres
+      user: weather_user
+  target: dev

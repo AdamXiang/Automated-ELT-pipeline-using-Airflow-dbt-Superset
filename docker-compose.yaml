@@ -46,7 +46,7 @@ services:
       - postgres
     networks:
       - my-network
-    command: debug
+    command: run
 
 networks:
   my-network:
