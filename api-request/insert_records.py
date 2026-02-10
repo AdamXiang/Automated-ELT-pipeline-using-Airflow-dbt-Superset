@@ -1,6 +1,5 @@
 import os
-
-from api_request import mock_fetch_data
+from api_request import mock_fetch_data, fetch_data
 import psycopg2
 from dotenv import load_dotenv
 
@@ -15,8 +14,8 @@ def connect_to_postgres():
 
     try:
       conn = psycopg2.connect(
-        host="localhost",
-        port=5000,
+        host="postgres",
+        port=5432,
         dbname='weather_db',
         user='weather_user',
         password=DB_PASSWORD
@@ -90,7 +89,7 @@ def insert_weather_data(conn, data):
 
 def main():
     try:
-        data = mock_fetch_data()
+        data = fetch_data()
         conn = connect_to_postgres()
         create_tables(conn)
         insert_weather_data(conn, data)
