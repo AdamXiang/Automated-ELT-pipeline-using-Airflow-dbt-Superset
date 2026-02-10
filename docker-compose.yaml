@@ -37,13 +37,16 @@ services:
     image: ghcr.io/dbt-labs/dbt-postgres:1.9.latest
     platform: linux/amd64
     volumes:
-      - ./dbt:/usr/app
+      - ./dbt/weather_project:/usr/app
+      - ./dbt:/root/.dbt
+    environment:
+      DBT_PROFILES_DIR: "/root/.dbt"
     working_dir: /usr/app
     depends_on:
       - postgres
     networks:
       - my-network
-    command: init weather_project
+    command: debug
 
 networks:
   my-network:
