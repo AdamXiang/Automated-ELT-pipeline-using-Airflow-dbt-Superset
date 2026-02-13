@@ -5,7 +5,7 @@
 
 WITH source AS (
     SELECT *
-    FROM {{ source('dev', 'raw_weather_date') }}
+    FROM {{ source('dev', 'raw_weather_data') }}
 ),
 de_dup AS (
     SELECT
@@ -15,10 +15,10 @@ de_dup AS (
         source
 )
 SELECT
-    id, city, temperature, weather_descriptions,
+    id, city, temperature, weather_description,
     wind_speed,
     time AS weather_time_local,
-    (inserted_at + (utc_offset || "hours")::interval) AS inserted_at_local
+    (inserted_at + (utc_offset || 'hours')::interval) AS inserted_at_local
 FROM
     de_dup
 WHERE

@@ -2,14 +2,10 @@ import os
 from api_request import mock_fetch_data, fetch_data
 import psycopg2
 from dotenv import load_dotenv
+import json
+from airflow.models import Variable
 
-load_dotenv('../.env')
-
-DB_PASSWORD = os.getenv('DB_PASSWORD')
-
-print(DB_PASSWORD)
-
-def connect_to_postgres():
+def connect_to_postgres(password):
     print("Connecting to the PostgreSQL database...")
 
     try:
@@ -18,7 +14,7 @@ def connect_to_postgres():
         port=5432,
         dbname='weather_db',
         user='weather_user',
-        password=DB_PASSWORD
+        password=password
       )
 
       return conn
@@ -55,6 +51,23 @@ def create_tables(conn):
 
 def insert_weather_data(conn, data):
     print("Inserting weather data...")
+
+    # 1. 安全檢查：確保資料是正確的
+    if not isinstance(data, dict):
+        raise ValueError(f"Data format error: Expected dict, got {type(data)}")
+
+    # 2. 檢查是否包含 'current'，如果沒有，把整包資料印出來看
+    if 'current' not in data:
+        # 這行會把那個「導致錯誤的壞資料」印在 Log 裡
+        print(f"❌ CRITICAL ERROR: API response is missing 'current' key.")
+        print(f"❌ BAD DATA: {json.dumps(data, indent=2)}")
+
+        # 檢查是否為 API 錯誤訊息
+        if 'error' in data:
+            raise ValueError(f"API Error: {data['error'].get('info', 'Unknown error')}")
+
+        raise KeyError("Missing 'current' key in API response")
+
     try:
         weather = data['current']
         location = data['location']
@@ -89,8 +102,10 @@ def insert_weather_data(conn, data):
 
 def main():
     try:
-        data = fetch_data()
-        conn = connect_to_postgres()
+        api_key = Variable.get("WEATHER_API_KEY")
+        data = fetch_data(api_key)
+        db_password = Variable.get("DB_PASSWORD")
+        conn = connect_to_postgres(db_password)
         create_tables(conn)
         insert_weather_data(conn, data)
     except Exception as e:

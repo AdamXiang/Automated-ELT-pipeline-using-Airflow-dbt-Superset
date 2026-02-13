@@ -3,7 +3,7 @@ version: 2
 
 sources:
   - name: dev
-    database: postgres
+    database: weather_db
     tables:
       - name: raw_weather_data
         columns:

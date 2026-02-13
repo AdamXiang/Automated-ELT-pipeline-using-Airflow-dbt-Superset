@@ -6,7 +6,7 @@
 SELECT
     city,
     temperature,
-    weather_descriptions,
+    weather_description,
     wind_speed,
     weather_time_local
 FROM

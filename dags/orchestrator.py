@@ -19,14 +19,14 @@ default_args = {
     default_args=default_args,
     description='A DAG to orchestrate data',
     start_date=datetime(2026, 2, 10),
-    schedule=timedelta(minutes=3),
+    schedule=timedelta(minutes=10),
     catchup=False,
     tags=['weather', 'api']
 )
 def weather_api_pipeline():
 
     # 將原本的 PythonOperator 改寫為 @task 裝飾的函數
-    @task(task_id='task1')
+    @task(task_id='insert_weather_data')
     def run_insert_records():
         # 直接呼叫引入的 main 函數
         main()
@@ -36,6 +36,7 @@ def weather_api_pipeline():
         image='ghcr.io/dbt-labs/dbt-postgres:1.9.latest',
         command='run',
         working_dir='/usr/app',
+        mount_tmp_dir=False,
         mounts=[
             Mount(
                 source='/Users/adam/Downloads/Project with Superset/dbt/weather_project',
