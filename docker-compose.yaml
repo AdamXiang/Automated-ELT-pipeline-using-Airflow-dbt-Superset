@@ -63,44 +63,39 @@ services:
   superset-init:
     platform: linux/amd64
     image: apache/superset:3.0.0-py310
-    command: [ "/app/docker/docker-init.sh" ]
-    env_file:
-      - path: docker/.env # default
-        required: true
+    user: root
+    environment:
+      # Superset 必須要有 Secret Key 才能啟動
+      SUPERSET_SECRET_KEY: "my_super_secret_key_12345"
+      # 直接連線到你的 Postgres
+      SQLALCHEMY_DATABASE_URI: "postgresql+psycopg2://weather_user:postgres@postgres:5432/weather_db"
+    # 我們不依賴外部腳本，直接用標準指令：更新資料庫 -> 建立管理員 -> 初始化
+    command: >
+      bash -c "superset db upgrade &&
+               superset fab create-admin --username admin --firstname Admin --lastname User --email admin@example.com --password admin &&
+               superset init"
     depends_on:
       postgres:
         condition: service_started
-      redis:
-        condition: service_started
-    user: *superset-user
-    volumes: *superset-volumes
-    environment:
-      SUPERSET_LOAD_EXAMPLES: "no"
-      SUPERSET_LOG_LEVEL: "${SUPERSET_LOG_LEVEL:-info}"
-      DATABASE_DB: "superset_db "
-    healthcheck:
-      disable: true
     networks:
       - my-network
 
   superset:
     platform: linux/amd64
-    env_file:
-      - path: docker/.env # default
-        required: true
     image: apache/superset:3.0.0-py310
-    command: [ "/app/docker/docker-bootstrap.sh", "app" ]
+    user: root
+    environment:
+      SUPERSET_SECRET_KEY: "my_super_secret_key_12345"
+      SQLALCHEMY_DATABASE_URI: "postgresql+psycopg2://weather_user:postgres@postgres:5432/weather_db"
+    # 啟動正式的 Web 伺服器 (gunicorn)
+    command: >
+      bash -c "gunicorn -w 2 --timeout 120 -b 0.0.0.0:8088 --limit-request-line 0 --limit-request-field_size 0 'superset.app:create_app()'"
     restart: unless-stopped
     ports:
-      - ${SUPERSET_PORT:-8088}:8088
-    user: *superset-user
+      - "8088:8088"
     depends_on:
       superset-init:
         condition: service_completed_successfully
-    volumes: *superset-volumes
-    environment:
-      SUPERSET_LOG_LEVEL: "${SUPERSET_LOG_LEVEL:-info}"
-      DATABASE_DB: "${POSTGRES_DB}"
     networks:
       - my-network
 
