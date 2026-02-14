@@ -31,8 +31,8 @@ A production-ready ELT (Extract, Load, Transform) pipeline that extracts real-ti
 │  │  - Fetch API data    │   │
 │  │  - Insert to Postgres│   │
 │  └──────────┬───────────┘   │
-│             │                │
-│             ▼                │
+│             │               │
+│             ▼               │
 │  ┌──────────────────────┐   │
 │  │  DockerOperator      │   │
 │  │  - Run DBT models    │   │
@@ -405,3 +405,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 **⭐ If this project helped you, consider giving it a star!**
+
